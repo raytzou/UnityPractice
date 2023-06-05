@@ -6,14 +6,6 @@ public class StarCollider : MonoBehaviour
 {
     [SerializeField] AudioSource SFX;
     [SerializeField] ParticleSystem[] VFXArray;
-    public int score;
-
-    void Start()
-    {
-        VFXArray = GetComponents<ParticleSystem>();
-        SFX = GetComponent<AudioSource>();
-        score = 0;
-    }
 
 
     private void OnCollisionEnter(Collision collision)
@@ -25,10 +17,8 @@ public class StarCollider : MonoBehaviour
                 vfx.Play();
             }
             SFX.Play();
-            transform.Find("SoftStar").gameObject.SetActive(false);
             gameObject.GetComponent<BoxCollider>().isTrigger = true;
-            score++;
-            Debug.LogError(score);
+            transform.Find("SoftStar").gameObject.SetActive(false);
         }
     }
 }

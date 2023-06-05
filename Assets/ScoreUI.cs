@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 
 public class ScoreUI : MonoBehaviour
 {
-    [SerializeField] TextMeshPro scoreUI;
+    [SerializeField] TMP_Text scoreUI;
     private int score;
 
     private void Start()
@@ -16,6 +13,7 @@ public class ScoreUI : MonoBehaviour
     }
     private void Update()
     {
-        //scoreUI.text
+        score = GameObject.Find("unitychan").GetComponent<CalcScore>().score;
+        scoreUI.text = ("Score: " + score);
     }
 }
