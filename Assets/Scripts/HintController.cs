@@ -7,7 +7,7 @@ public class HintController : MonoBehaviour
 {
     [SerializeField]
     TMP_Text tmp;
-    void Start()
+    void Awake()
     {
         tmp = GetComponent<TMP_Text>();
         StartCoroutine(FadeOutCoroutine());
