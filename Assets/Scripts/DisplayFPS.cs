@@ -13,14 +13,14 @@ public class DisplayFPS : MonoBehaviour
     {
         var playerObject = GameObject.Find("Player");
         int currentFps = (int)(1f / Time.unscaledDeltaTime);
-        float positionX = playerObject.transform.position.x;
-        float positionY = playerObject.transform.position.y;
-        float positionZ = playerObject.transform.position.z;
+        float positionX = Mathf.Round(playerObject.transform.position.x);
+        float positionY = Mathf.Round(playerObject.transform.position.y);
+        float positionZ = Mathf.Round(playerObject.transform.position.z);
         
 
         UI.text = currentFps.ToString() + " FPS";
-        UI.text += "   / " + positionX.ToString();
-        UI.text += " / " + positionY.ToString();
-        UI.text += " / " + positionZ.ToString();
+        UI.text += "   X: " + positionX;
+        UI.text += " / Y: " + positionY;
+        UI.text += " / Z: " + positionZ;
     }
 }
