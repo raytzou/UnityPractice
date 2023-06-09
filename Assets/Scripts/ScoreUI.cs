@@ -13,7 +13,7 @@ public class ScoreUI : MonoBehaviour
     }
     private void Update()
     {
-        score = GameObject.Find("unitychan").GetComponent<CalcScore>().score;
+        score = GameObject.Find("Player").GetComponent<CalcScore>().score;
         scoreUI.text = ("Score: " + score);
     }
 }

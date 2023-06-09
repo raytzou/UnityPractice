@@ -11,7 +11,7 @@ public class DisplayFPS : MonoBehaviour
 
     void Update()
     {
-        var playerObject = GameObject.Find("unitychan");
+        var playerObject = GameObject.Find("Player");
         int currentFps = (int)(1f / Time.unscaledDeltaTime);
         float positionX = playerObject.transform.position.x;
         float positionY = playerObject.transform.position.y;

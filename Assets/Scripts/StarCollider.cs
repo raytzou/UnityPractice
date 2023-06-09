@@ -10,7 +10,7 @@ public class StarCollider : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "unitychan")
+        if (collision.gameObject.name == "Player")
         {
             foreach (var vfx in VFXArray)
             {

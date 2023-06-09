@@ -9,7 +9,7 @@ public class MyPlayerController : MonoBehaviour
 
     [SerializeField]
     [Range(0, 200)]
-    float speed = 100f;
+    float speed = 10f;
     bool IsJump = false;
 
 
