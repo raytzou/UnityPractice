@@ -15,5 +15,10 @@ public class ScoreUI : MonoBehaviour
     {
         score = GameObject.Find("Player").GetComponent<CalcScore>().score;
         scoreUI.text = ("Score: " + score);
+
+        if(score == GameObject.FindGameObjectsWithTag("Star").Length)
+        {
+            scoreUI.text = "All Stars have been found!";
+        }
     }
 }
