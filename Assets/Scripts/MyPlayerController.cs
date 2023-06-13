@@ -30,8 +30,7 @@ public class MyPlayerController : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        HideMouse();
     }
 
     private void Update() // IDK, does Update mean real-time?
@@ -41,9 +40,19 @@ public class MyPlayerController : MonoBehaviour
             IsJump = true;
         }
 
+        PlayerEdgeProtection();
+    }
+
+    private void FixedUpdate() // 物理運算於此運算似乎較精準?
+    {
+        if (IsJump)
+        {
+            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Acceleration);
+            IsJump = false; // 跳完直接切換
+        }
+
         PlayerMove();
         MouseMove();
-        PlayerEdgeProtection();
     }
 
     private void OnCollisionStay(Collision collision)
@@ -61,21 +70,17 @@ public class MyPlayerController : MonoBehaviour
             IsEnableToJump = false;
     }
 
-    private void FixedUpdate() // 物理運算於此運算似乎較精準?
-    {
-        if(IsJump)
-        {
-            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Acceleration);
-            IsJump = false; // 跳完直接切換
-        }
-    }
-
     private void PlayerMove()
     {
         float xValue = Input.GetAxis("Horizontal");
         float zValue = Input.GetAxis("Vertical");
 
         transform.Translate(xValue * speed * Time.deltaTime, 0f, zValue * speed * Time.deltaTime);
+
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            ShowPauseMenu();
+        }
     }
 
     private void MouseMove()
@@ -91,6 +96,25 @@ public class MyPlayerController : MonoBehaviour
 
         transform.Find("Camera").GetComponent<Camera>().transform.eulerAngles = new Vector3(mousePitch, mouseYaw, 0f);
         transform.eulerAngles = new Vector3(0f, mouseYaw, 0f);
+    }
+
+    private void ShowPauseMenu()
+    {
+        ShowMouse();
+        Time.timeScale = 0f; // stop the game
+        GameObject.Find("UI").transform.Find("PauseMenu").gameObject.SetActive(true);
+    }
+
+    private void HideMouse()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void ShowMouse()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private void PlayerEdgeProtection()
