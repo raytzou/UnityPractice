@@ -7,6 +7,7 @@ TagManager:
   - Ladder
   - Fire
   - Ground
+  - Star
   layers:
   - Default
   - TransparentFX
