@@ -28,6 +28,12 @@ public class MyPlayerController : MonoBehaviour
     private bool IsEnableToJump = false;
     private float mouseYaw = 0f, mousePitch = 0f;
 
+    private void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
     private void Update() // IDK, does Update mean real-time?
     {
         if (Input.GetKeyDown(KeyCode.Space) && IsEnableToJump)
@@ -76,8 +82,8 @@ public class MyPlayerController : MonoBehaviour
     {
         int offset = 50;
 
-        mouseYaw += speed * offset * Time.deltaTime * Input.GetAxis("Mouse X");
-        mousePitch -= speed * offset * Time.deltaTime * Input.GetAxis("Mouse Y");
+        mouseYaw += mouseSpeed * offset * Time.deltaTime * Input.GetAxis("Mouse X");
+        mousePitch -= mouseSpeed * offset * Time.deltaTime * Input.GetAxis("Mouse Y");
 
         // restrict angle
         if (mousePitch < -70) mousePitch = -70;
