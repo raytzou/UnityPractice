@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,8 +15,8 @@ public class MyPlayerController : MonoBehaviour
     Rigidbody rigidBody;
 
     [SerializeField]
-    [Range(0, 200)]
-    float speed = 10f;
+    [Range(250, 500)]
+    float speed = 250f;
 
     [SerializeField]
     float jumpForce = 200f;
@@ -35,14 +36,17 @@ public class MyPlayerController : MonoBehaviour
 
     private void Update() // IDK, does Update mean real-time?
     {
-        if (Input.GetKeyDown(KeyCode.Space) && IsEnableToJump)
-        {
-            IsJump = true;
-        }
+        if (Input.GetKeyDown(KeyCode.Space) && IsEnableToJump) IsJump = true;
+        if (Input.GetKeyDown(KeyCode.Escape)) ShowPauseMenu();
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) speed *= 2;
+        if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift)) speed /= 2;
 
         PlayerEdgeProtection();
     }
 
+    /// <summary>
+    /// FixedUpdate() is executed at regular time intervals.
+    /// </summary>
     private void FixedUpdate() // 物理運算於此運算似乎較精準?
     {
         if (IsJump)
@@ -52,8 +56,13 @@ public class MyPlayerController : MonoBehaviour
         }
 
         PlayerMove();
+        if (Input.GetKey(KeyCode.Mouse0))
+            Shoot();
     }
 
+    /// <summary>
+    /// Same as Update(), it will be executed once every frame, the difference is that it will wait for all Update() of scripts to be executed before executing.
+    /// </summary>
     private void LateUpdate() // IDK, but looks like when calculating angle, we often use LateUpdate()
     {
         MouseMove();
@@ -76,15 +85,21 @@ public class MyPlayerController : MonoBehaviour
 
     private void PlayerMove()
     {
-        float xValue = Input.GetAxis("Horizontal");
-        float zValue = Input.GetAxis("Vertical");
+        float velY = rigidBody.velocity.y; // store original velocity.y
+        Vector3 xValue = Input.GetAxis("Horizontal") * transform.right;
+        Vector3 zValue = Input.GetAxis("Vertical") * transform.forward;
+        Vector3 moveAmount = Vector3.zero;
 
-        transform.Translate(xValue * speed * Time.deltaTime, 0f, zValue * speed * Time.deltaTime);
+        //transform.Translate(xValue * speed * Time.deltaTime, 0f, zValue * speed * Time.deltaTime);
+        
+        moveAmount = (xValue + zValue) * speed * Time.deltaTime;
+        moveAmount.y = velY;
+        rigidBody.velocity = moveAmount;
+    }
 
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            ShowPauseMenu();
-        }
+    private void Shoot()
+    {
+        throw new NotImplementedException();
     }
 
     private void MouseMove()
