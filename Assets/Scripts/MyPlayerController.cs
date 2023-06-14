@@ -52,6 +52,10 @@ public class MyPlayerController : MonoBehaviour
         }
 
         PlayerMove();
+    }
+
+    private void LateUpdate() // IDK, but looks like when calculating angle, we often use LateUpdate()
+    {
         MouseMove();
     }
 
