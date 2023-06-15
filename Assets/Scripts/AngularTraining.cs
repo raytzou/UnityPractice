@@ -31,7 +31,7 @@ public class AngularTraining : MonoBehaviour
         if (horizontalAngle > 30f) horizontalAngle = 30f; // 防止頭旋轉過頭造成怪異現象
         if (dotHorizontalAngle < 0f) horizontalAngle = -horizontalAngle; // 水平角度，純量角度不具方向性，透過向量內積取得方向性
         if (verticleAngle > 10f) verticleAngle = 10f; // 防止頭旋轉過頭造成怪異現象
-        if (vectorToTarget.y > 0f) verticleAngle = -verticleAngle; // 垂直角度可直接由Unity-chan往Target的向量的Y值判斷方向
+        if (vectorToTarget.y > 0f) verticleAngle = -verticleAngle; // 垂直角度可直接由Unity-chan往Target的向量的Y值判斷方向，Unity-chan頭的Y軸向下，因此Y軸大於零角度為負
         
 
         // 計算四元數尤拉角
