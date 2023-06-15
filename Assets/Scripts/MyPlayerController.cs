@@ -94,18 +94,24 @@ public class MyPlayerController : MonoBehaviour
         float velY = rigidBody.velocity.y; // store original velocity.y
         Vector3 xValue = Input.GetAxis("Horizontal") * transform.right;
         Vector3 zValue = Input.GetAxis("Vertical") * transform.forward;
-        Vector3 moveAmount = Vector3.zero;
+        Vector3 moveAmount = (xValue + zValue) * speed * Time.deltaTime;
 
         //transform.Translate(xValue * speed * Time.deltaTime, 0f, zValue * speed * Time.deltaTime);
-        
-        moveAmount = (xValue + zValue) * speed * Time.deltaTime;
         moveAmount.y = velY;
         rigidBody.velocity = moveAmount;
     }
 
     private void Shoot()
     {
-        throw new NotImplementedException();
+        Ray ray = new(CameraObj.position, CameraObj.forward);
+        int layerMask = 1 << LayerMask.NameToLayer("Ground");
+        RaycastHit hit;
+        bool isHit = Physics.Raycast(ray, out hit, 100f);
+
+        if (isHit)
+        {
+            Debug.LogError(hit.collider.name);
+        }
     }
 
     private void MouseMove()
@@ -119,7 +125,7 @@ public class MyPlayerController : MonoBehaviour
         if (mousePitch < -70) mousePitch = -70;
         if (mousePitch > 80) mousePitch = 80;
 
-        CameraObj.position = Vector3.Lerp(CameraObj.position, CameraFollower.position, 1.0f);
+        CameraObj.position = Vector3.Lerp(CameraObj.position, CameraFollower.position, 1.0f); // 攝影機到玩家中間做內插，使鏡頭晃動幅度較低
         CameraObj.transform.eulerAngles = new Vector3(mousePitch, mouseYaw, 0f);
         transform.eulerAngles = new Vector3(0f, mouseYaw, 0f);
     }
