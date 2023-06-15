@@ -36,9 +36,9 @@ public class AngularTraining : MonoBehaviour
 
         // 計算四元數尤拉角
         Quaternion quaRotationAngle = Quaternion.Euler(0, horizontalAngle, 0);
-        // 利用尤拉角計算用計算新向量(Unity-chan左右轉頭)
+        // 利用尤拉角計算水平向量(垂直軸，Unity-chan左右轉頭)
         Vector3 vectorWithRotationAngle = quaRotationAngle * vectorForward;
-        // 外積計算垂直向量(取得水平軸，Unity-chan垂直點頭)
+        // 外積計算垂直向量(水平軸，Unity-chan垂直點頭)
         Vector3 horizontalAxis = Vector3.Cross(Vector3.up, vectorWithRotationAngle);
         // 利用四元數計算軸線
         Quaternion quaRotationAxis = Quaternion.AngleAxis(verticleAngle, horizontalAxis);
