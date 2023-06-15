@@ -15,6 +15,12 @@ public class MyPlayerController : MonoBehaviour
     Rigidbody rigidBody;
 
     [SerializeField]
+    Transform CameraObj;
+
+    [SerializeField]
+    Transform CameraFollower;
+
+    [SerializeField]
     [Range(250, 500)]
     float speed = 250f;
 
@@ -40,6 +46,7 @@ public class MyPlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) ShowPauseMenu();
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) speed *= 2;
         if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift)) speed /= 2;
+        if (Input.GetKey(KeyCode.Mouse0)) Shoot();
 
         PlayerEdgeProtection();
     }
@@ -56,8 +63,7 @@ public class MyPlayerController : MonoBehaviour
         }
 
         PlayerMove();
-        if (Input.GetKey(KeyCode.Mouse0))
-            Shoot();
+        
     }
 
     /// <summary>
@@ -113,7 +119,8 @@ public class MyPlayerController : MonoBehaviour
         if (mousePitch < -70) mousePitch = -70;
         if (mousePitch > 80) mousePitch = 80;
 
-        transform.Find("Camera").GetComponent<Camera>().transform.eulerAngles = new Vector3(mousePitch, mouseYaw, 0f);
+        CameraObj.position = Vector3.Lerp(CameraObj.position, CameraFollower.position, 1.0f);
+        CameraObj.transform.eulerAngles = new Vector3(mousePitch, mouseYaw, 0f);
         transform.eulerAngles = new Vector3(0f, mouseYaw, 0f);
     }
 
