@@ -117,6 +117,7 @@ public class MyPlayerController : MonoBehaviour
     private void MouseMove()
     {
         int offset = 50;
+        float cameraHeight = 0.7f;
 
         mouseYaw += mouseSpeed * offset * Time.deltaTime * Input.GetAxis("Mouse X");
         mousePitch -= mouseSpeed * offset * Time.deltaTime * Input.GetAxis("Mouse Y");
@@ -125,7 +126,7 @@ public class MyPlayerController : MonoBehaviour
         if (mousePitch < -70) mousePitch = -70;
         if (mousePitch > 80) mousePitch = 80;
 
-        CameraObj.position = Vector3.Lerp(CameraObj.position, CameraFollower.position, 1.0f); // 攝影機到玩家中間做內插，使鏡頭晃動幅度較低
+        CameraObj.position = Vector3.Lerp(CameraObj.position, CameraFollower.position + Vector3.up * cameraHeight, 0.65f); // 攝影機到玩家中間做內插，使鏡頭晃動幅度較低
         CameraObj.transform.eulerAngles = new Vector3(mousePitch, mouseYaw, 0f);
         transform.eulerAngles = new Vector3(0f, mouseYaw, 0f);
     }
