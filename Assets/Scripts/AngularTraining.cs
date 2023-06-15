@@ -5,7 +5,7 @@ using UnityEngine;
 public class AngularTraining : MonoBehaviour
 {
     [SerializeField]
-    Transform Head, Target; // Unity-chanªºÀY¸ò
+    Transform Head, Target; // Unity-chançš„é ­è·Ÿç›´è¦–ç›®æ¨™ç‰©
 
     /// <summary>
     /// Unity-chan looks at a sphere
@@ -16,37 +16,37 @@ public class AngularTraining : MonoBehaviour
         Vector3 vectorForward = transform.forward; // Unity-chan's forward vector
         Vector3 horizontalVector = vectorToTarget;
 
-        horizontalVector.y = 0f; // init, ¤£¬İy¶b
-        horizontalVector.Normalize(); // ¥¿³W¤Æ¡A¨ú³æ¦ì¦V¶q
+        horizontalVector.y = 0f; // init, ä¸çœ‹yè»¸
+        horizontalVector.Normalize(); // æ­£è¦åŒ–ï¼Œå–å–®ä½å‘é‡
 
-        //¥H¤U¨¤«×¬°¯Â¶q¡AµL¤è¦V©Ê¡A­pºâ«á¥æ¥Ñ©Ô¨¤¡B¥|¤¸¼Æ¡Aµy«á¥Î¨Ó­pºâ±ÛÂà¶b¨¤«×
+        //ä»¥ä¸‹è§’åº¦ç‚ºç´”é‡ï¼Œç„¡æ–¹å‘æ€§ï¼Œè¨ˆç®—å¾Œäº¤ç”±æ‹‰è§’ã€å››å…ƒæ•¸ï¼Œç¨å¾Œç”¨ä¾†è¨ˆç®—æ—‹è½‰è»¸è§’åº¦
         float verticleAngle = Vector3.Angle(vectorToTarget, horizontalVector);
         float horizontalAngle = Vector3.Angle(horizontalVector, vectorForward);
         //Debug.LogError("pitch: " + verticleAngle + " yaw: " + horizontalAngle);
 
-        //­pºâ¾÷¹Ï§Î¾Ç±`¥Î¨Ó§PÂ_¤è¦V¡A¦p¨â¦V¶q¤º¿n¤j©ó0¡A«h¥¦­Ìªº¤è¦V´Â¦V¬Ûªñ¡F¦pªG¤p©ó0¡A«h¤è¦V¬Û¤Ï¡C(0¥Nªí¤ô¥­¸m¤¤)¡Athx wikipedia summary help math idiot lol
+        //è¨ˆç®—æ©Ÿåœ–å½¢å­¸å¸¸ç”¨ä¾†åˆ¤æ–·æ–¹å‘ï¼Œå¦‚å…©å‘é‡å…§ç©å¤§æ–¼0ï¼Œå‰‡å®ƒå€‘çš„æ–¹å‘æœå‘ç›¸è¿‘ï¼›å¦‚æœå°æ–¼0ï¼Œå‰‡æ–¹å‘ç›¸åã€‚(0ä»£è¡¨æ°´å¹³ç½®ä¸­)ï¼Œthx wikipedia summary help math idiot lol
         float dotHorizontalAngle = Vector3.Dot(transform.right, horizontalVector);
         //Debug.LogError(dotHorizontalAngle);
 
-        if (horizontalAngle > 30f) horizontalAngle = 30f; // ¨¾¤îÀY±ÛÂà¹LÀY³y¦¨©Ç²§²{¶H
-        if (dotHorizontalAngle < 0f) horizontalAngle = -horizontalAngle; // ¤ô¥­¨¤«×¡A¯Â¶q¨¤«×¤£¨ã¤è¦V©Ê¡A³z¹L¦V¶q¤º¿n¨ú±o¤è¦V©Ê
-        if (verticleAngle > 10f) verticleAngle = 10f; // ¨¾¤îÀY±ÛÂà¹LÀY³y¦¨©Ç²§²{¶H
-        if (vectorToTarget.y > 0f) verticleAngle = -verticleAngle; // ««ª½¨¤«×¥iª½±µ¥ÑUnity-chan©¹Targetªº¦V¶qªºY­È§PÂ_¤è¦V
+        if (horizontalAngle > 30f) horizontalAngle = 30f; // é˜²æ­¢é ­æ—‹è½‰éé ­é€ æˆæ€ªç•°ç¾è±¡
+        if (dotHorizontalAngle < 0f) horizontalAngle = -horizontalAngle; // æ°´å¹³è§’åº¦ï¼Œç´”é‡è§’åº¦ä¸å…·æ–¹å‘æ€§ï¼Œé€éå‘é‡å…§ç©å–å¾—æ–¹å‘æ€§
+        if (verticleAngle > 10f) verticleAngle = 10f; // é˜²æ­¢é ­æ—‹è½‰éé ­é€ æˆæ€ªç•°ç¾è±¡
+        if (vectorToTarget.y > 0f) verticleAngle = -verticleAngle; // å‚ç›´è§’åº¦å¯ç›´æ¥ç”±Unity-chanå¾€Targetçš„å‘é‡çš„Yå€¼åˆ¤æ–·æ–¹å‘
         
 
-        // ­pºâ¥|¤¸¼Æ¤×©Ô¨¤
+        // è¨ˆç®—å››å…ƒæ•¸å°¤æ‹‰è§’
         Quaternion quaRotationAngle = Quaternion.Euler(0, horizontalAngle, 0);
-        // §Q¥Î¤×©Ô¨¤­pºâ¥Î­pºâ·s¦V¶q(Unity-chan¥ª¥kÂàÀY)
+        // åˆ©ç”¨å°¤æ‹‰è§’è¨ˆç®—ç”¨è¨ˆç®—æ–°å‘é‡(Unity-chanå·¦å³è½‰é ­)
         Vector3 vectorWithRotationAngle = quaRotationAngle * vectorForward;
-        // ¥~¿n­pºâ««ª½¦V¶q(¨ú±o¤ô¥­¶b¡AUnity-chan««ª½ÂIÀY)
+        // å¤–ç©è¨ˆç®—å‚ç›´å‘é‡(å–å¾—æ°´å¹³è»¸ï¼ŒUnity-chanå‚ç›´é»é ­)
         Vector3 horizontalAxis = Vector3.Cross(Vector3.up, vectorWithRotationAngle);
-        // §Q¥Î¥|¤¸¼Æ­pºâ¶b½u
+        // åˆ©ç”¨å››å…ƒæ•¸è¨ˆç®—è»¸ç·š
         Quaternion quaRotationAxis = Quaternion.AngleAxis(verticleAngle, horizontalAxis);
 
-        // ­«·s­pºâ³Ì«á¦V¶q
+        // é‡æ–°è¨ˆç®—æœ€å¾Œå‘é‡
         vectorToTarget = quaRotationAxis * vectorWithRotationAngle;
-        // ¦b³o¸Ì¯u¥¿±ÛÂàUnity-chanªºÀY lol
-        Head.rotation = quaRotationAxis * quaRotationAngle * Head.rotation; // ¥|¤¸¼Æ¨S¦³¥æ´«²v¡A¤£¥i¥H¼g¦¨ Head.rotation *= xxx;
+        // åœ¨é€™è£¡çœŸæ­£æ—‹è½‰Unity-chançš„é ­ lol
+        Head.rotation = quaRotationAxis * quaRotationAngle * Head.rotation; // å››å…ƒæ•¸æ²’æœ‰äº¤æ›ç‡ï¼Œä¸å¯ä»¥å¯«æˆ Head.rotation *= xxx;
     }
 
     private void OnDrawGizmos()
