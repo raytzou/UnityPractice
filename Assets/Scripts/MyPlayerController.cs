@@ -104,7 +104,7 @@ public class MyPlayerController : MonoBehaviour
     private void Shoot()
     {
         Ray ray = new(CameraObj.position, CameraObj.forward);
-        int layerMask = 1 << LayerMask.NameToLayer("Ground");
+        int layerMask = 1 << LayerMask.NameToLayer("Ground"); // bit manipulation with OR for calculating layer mask which layer has been checked
         RaycastHit hit;
         bool isHit = Physics.Raycast(ray, out hit, 100f);
 
