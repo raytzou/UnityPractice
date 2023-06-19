@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GodViewTraining : MonoBehaviour
 {
-    [SerializeField] Transform Target;
+    [SerializeField] Transform Target;¡@// ª±®a
 
     private Vector3 _vectorTargetToCamera;
     private float _distanceToTarget;
