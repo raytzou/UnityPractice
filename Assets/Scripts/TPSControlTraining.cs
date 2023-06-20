@@ -5,6 +5,7 @@ using UnityEngine;
 /*
  * Class Note:
  * 四元數多半使用於向量需要做Rotation等transform
+ * SimpleMove導致角色漂浮，可能是因為Character Controller導致(Skin Width in Inspecter)
  * **/
 
 public class TPSControlTraining : MonoBehaviour
