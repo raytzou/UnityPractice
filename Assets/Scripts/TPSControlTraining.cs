@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine.Utility;
 using UnityEngine;
 
 /*
@@ -57,7 +58,7 @@ public class TPSControlTraining : MonoBehaviour
 
 
         //var newCameraPosition = CameraTarget.transform.position - finalVector * DistanceToTarget; // 處理過水平、垂直後的攝影機定位
-        var newCameraPosition = Vector3.zero; // 重新初始化
+        Vector3 newCameraPosition; // 重新初始化
 
 
         #region 處理鏡頭超出牆壁或地上
@@ -81,7 +82,18 @@ public class TPSControlTraining : MonoBehaviour
         float MoveVertical = Input.GetAxis("Vertical");
         float MoveHorizontal = Input.GetAxis("Horizontal");
 
-        transform.Rotate(0, MoveHorizontal, 0); // 角色旋轉，單純Rotate Horizontal Axis即可
-        Controller.SimpleMove(MoveVertical * Velocity * transform.forward);
+        //transform.Rotate(0f, MoveHorizontal, 0f); // 角色旋轉，單純Rotate Horizontal Axis即可
+        
+        var vectorToCameraForward = MoveVertical * Velocity * CameraTransform.forward; // W、S 前後方向依CameraTransform
+        var vectorToCameraRight = MoveHorizontal * Velocity * CameraTransform.right; // A、D左右平移同理
+        vectorToCameraForward.y = 0f; // Y 軸拿掉，改使用Move()，不拿掉Y軸，Camera看天空、地上，角色會跟著翻轉
+        Vector3 finalVector = vectorToCameraForward + vectorToCameraRight; // 最後結果，兩向量相加
+
+        Controller.Move(finalVector * Time.deltaTime); // 實際依向量結果移動
+
+        #region 角色轉向結果
+        if (MoveVertical != 0 || MoveHorizontal != 0) // 按下W, A, S, D旋轉角色，角色朝向鏡頭前方
+            transform.forward = Vector3.Lerp(transform.forward, vectorToCameraForward, 0.1f);
+        #endregion
     }
 }
