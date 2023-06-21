@@ -32,4 +32,37 @@ public class Main
     {
         Debug.LogError("My singleton");
     }
+
+    /// <summary>
+    /// Example for loading resource
+    /// </summary>
+    public void LoadResourcesTest()
+    {
+        var obj = Resources.Load("Target");
+        Debug.Log("Resource load: " + obj.name + " type: " + obj.GetType());
+    }
+
+    /// <summary>
+    /// Find any resource under Resource folder, return its GameObject if it has been found, otherwise return new GameObject.
+    /// </summary>
+    /// <param name="fileName">File name or path of resource.</param>
+    /// <returns></returns>
+    public GameObject FindResource(string fileName)
+    {
+        if(string.IsNullOrEmpty(fileName))
+        {
+            Debug.LogError("file name is empty or null.");
+            return new GameObject();
+        }
+
+        var result = Resources.Load(fileName) as GameObject;
+        
+        if (result == null)
+        {
+            Debug.LogError("Cannot find: " + fileName);
+            return new GameObject();
+        }
+
+        return result;
+    }
 }
