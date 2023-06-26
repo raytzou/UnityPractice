@@ -28,6 +28,9 @@ public class TPSControlTraining : MonoBehaviour
     private void Start()
     {
         HorizontalDirection = transform.forward;
+
+        Main.Singleton.Init(); // singleton test
+        Main.Singleton.LoadResourcesTest(); // singleton test
     }
 
     private void Update()
