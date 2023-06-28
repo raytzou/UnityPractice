@@ -46,7 +46,7 @@ public class MyPlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) ShowPauseMenu();
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) speed *= 2;
         if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift)) speed /= 2;
-        if (Input.GetKey(KeyCode.Mouse0)) Shoot();
+        if (Input.GetKeyDown(KeyCode.Mouse0)) Shoot();
 
         PlayerEdgeProtection();
     }
@@ -104,13 +104,17 @@ public class MyPlayerController : MonoBehaviour
     private void Shoot()
     {
         Ray ray = new(CameraObj.position, CameraObj.forward);
-        int layerMask = 1 << LayerMask.NameToLayer("Ground"); // bit manipulation with OR for calculating layer mask which layer has been checked
-        RaycastHit hit;
-        bool isHit = Physics.Raycast(ray, out hit, 100f);
+        //int layerMask = 1 << LayerMask.NameToLayer("Ground"); // bit manipulation with OR for calculating layer mask which layer has been checked
 
-        if (isHit)
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
         {
-            Debug.LogError(hit.collider.name);
+            Debug.Log("hit: " + hit.collider.name);
+            if (hit.collider.name.Contains("Target"))
+            {
+                //Destroy(hit.collider.gameObject);
+                hit.collider.gameObject.SendMessage("CalcDamage");
+                //Enemy.EnemySingleton().CalcDamage();
+            }
         }
     }
 
