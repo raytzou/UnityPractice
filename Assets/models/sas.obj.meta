@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6d317c72eef78224a81374ec28db780b
+guid: a417657f1652bba40b9eaafd5a187eab
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -7,8 +7,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: knifeskin.bmp
-    second: {fileID: 2100000, guid: fe73a2cb9c053044c8bde53fc3b4090a, type: 2}
+      name: Chrome1.BMP
+    second: {fileID: 2100000, guid: a7aaeeb677930b8449bf6db8aa0472fe, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SAS_DMBASE1.BMP
+    second: {fileID: 2100000, guid: 8d58fcf0bb96be04e9637dd693146ad6, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
