@@ -3,12 +3,16 @@ guid: 6d317c72eef78224a81374ec28db780b
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
+<<<<<<< HEAD
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: knifeskin.bmp
     second: {fileID: 2100000, guid: fe73a2cb9c053044c8bde53fc3b4090a, type: 2}
+=======
+  externalObjects: {}
+>>>>>>> c061d0cd663ad2942dd6b49a72d0d4f606cc6517
   materials:
     materialImportMode: 2
     materialName: 0
