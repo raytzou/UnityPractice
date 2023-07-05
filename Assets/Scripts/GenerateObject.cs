@@ -15,11 +15,12 @@ public class GenerateObject : MonoBehaviour
     [Range(1f, 10f)]
     float SpawnRange = 1.0f;
 
-    private List<GameObject> _targetList;
+    //private List<GameObject> _targetList;
 
     private void Start()
     {
-        _targetList = new();
+        TargetReusePool.GetSingleton.InitTargetPool();
+        //_targetList = new();
        
         for (int i = 0; i < TargetNum; i++)
         {
@@ -31,7 +32,7 @@ public class GenerateObject : MonoBehaviour
 
             randomSpawnPoint.Normalize();
             target.transform.position = randomSpawnPoint * SpawnRange + transform.position; // transform.position => 以Object所在位置生成
-            _targetList.Add(target);
+            //TargetReusePool.GetSingleton..Add(target);
         }
     }
 }
