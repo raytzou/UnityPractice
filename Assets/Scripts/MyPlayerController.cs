@@ -21,11 +21,8 @@ public class MyPlayerController : MonoBehaviour
     Transform CameraFollower;
 
     [SerializeField]
-    [Range(250, 500)]
+    //[Range(250, 500)]
     float speed = 250f;
-
-    [SerializeField]
-    float jumpForce = 200f;
 
     [SerializeField]
     [Range(1, 20)]
@@ -34,6 +31,9 @@ public class MyPlayerController : MonoBehaviour
     private bool IsJump = false;
     private bool IsEnableToJump = false;
     private float mouseYaw = 0f, mousePitch = 0f;
+
+    //[NonSerialized]
+    public float PlayerHP { get; set; } = 0.3f;
 
     private void Start()
     {
@@ -58,12 +58,11 @@ public class MyPlayerController : MonoBehaviour
     {
         if (IsJump)
         {
-            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Acceleration);
+            rigidBody.AddForce(Vector3.up * speed, ForceMode.Acceleration);
             IsJump = false; // ¸õ§¹ª½±µ¤Á´«
         }
 
         PlayerMove();
-        
     }
 
     /// <summary>
@@ -74,29 +73,25 @@ public class MyPlayerController : MonoBehaviour
         MouseMove();
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void PlayerMove()
     {
-        
-        if (collision.transform.tag == "Ground")
+        //Debug.Log(transform.position);
+        Ray ray = new(transform.position, -transform.up);
+
+        if(Physics.Raycast(ray, out RaycastHit hitInfo, 1.6f))
         {
             IsEnableToJump = true;
         }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if(IsEnableToJump)
+        else
+        {
             IsEnableToJump = false;
-    }
+        }
 
-    private void PlayerMove()
-    {
         float velY = rigidBody.velocity.y; // store original velocity.y
         Vector3 xValue = Input.GetAxis("Horizontal") * transform.right;
         Vector3 zValue = Input.GetAxis("Vertical") * transform.forward;
-        Vector3 moveAmount = (xValue + zValue) * speed * Time.deltaTime;
+        Vector3 moveAmount = speed * Time.deltaTime * (xValue + zValue);
 
-        //transform.Translate(xValue * speed * Time.deltaTime, 0f, zValue * speed * Time.deltaTime);
         moveAmount.y = velY;
         rigidBody.velocity = moveAmount;
     }
