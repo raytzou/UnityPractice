@@ -8,17 +8,22 @@ public class StarCollider : MonoBehaviour
     [SerializeField] ParticleSystem[] VFXArray;
 
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerExit(Collider other)
     {
-        if (collision.gameObject.name == "Player")
+        if (other.gameObject.name == "Player")
         {
+            transform.Find("SoftStar").gameObject.SetActive(false);
             foreach (var vfx in VFXArray)
             {
                 vfx.Play();
             }
             SFX.Play();
-            gameObject.GetComponent<BoxCollider>().isTrigger = true;
-            transform.Find("SoftStar").gameObject.SetActive(false);
+            gameObject.GetComponent<SphereCollider>().isTrigger = false;
+
+            var hp = other.gameObject.GetComponent<MyPlayerController>().PlayerHP;
+           
+            if (hp + .5f >= 1.0000f) other.gameObject.GetComponent<MyPlayerController>().PlayerHP = 1.0000f;
+            else other.gameObject.GetComponent<MyPlayerController>().PlayerHP += .5f;
         }
     }
 }

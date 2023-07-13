@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class CalcScore : MonoBehaviour
 {
-    [NonSerialized] public int score = 0;
+    public int PlayerScore { get; set; } = 0;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.name.Contains("Star"))
+        if (other.gameObject.name.Contains("Star"))
         {
-            score++;
+            PlayerScore++;
         }
     }
 }
