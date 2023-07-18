@@ -31,10 +31,8 @@ public class Target : MonoBehaviour
         GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f);
 
         targetHP -= 50;
-        Debug.LogError("HP: " + targetHP);
+        //Debug.LogError("HP: " + targetHP);
         if(targetHP <= 0)
-        {
-            Destroy(gameObject);
-        }
+            ObjectReusePool.GetSingleton.DisableObject(gameObject.name);
     }
 }

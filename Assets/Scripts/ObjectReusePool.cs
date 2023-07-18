@@ -20,7 +20,11 @@ public class ObjectReusePool
         public bool isUsing = false; // is object using?
     }
 
+    private bool _allActived = false;
+    public bool AllActived { get => _allActived; }
+
     private List<ObjectStatus> _objectList; // store Object's status
+    private string _objectName;
 
     /// <summary>
     /// Pool, actually it's just a fooking List lol.
@@ -28,15 +32,18 @@ public class ObjectReusePool
     public void InitObjectPool(Object obj, int spawnTimes)
     {
         _objectList = new List<ObjectStatus>();
+        _objectName = obj.name;
         
         for(int i = 0; i < spawnTimes; i++)
         {
+            GameObject target = GameObject.Instantiate(obj) as GameObject;
+            target.name = target.name.Replace("(Clone)", "") + i;
             _objectList.Add(new ObjectStatus
             {
-                theObject = obj as GameObject,
-                isUsing = false
+                theObject = target,
+                isUsing = false,
             });
-
+            
             _objectList[i].theObject.SetActive(false);
         }
 
@@ -59,43 +66,33 @@ public class ObjectReusePool
     /// <param name="spawnPoint">Vector3: the position of spawn point</param>
     public void SpawnObject(float spawnRange, Vector3 spawnPoint)
     {
-        //Debug.LogWarning($"spawn point: {spawnPoint}");
-        /*for (int i = 0; i < TargetNum; i++)
-        {
-            Vector3 randomSpawnPoint = new(Random.Range(-1f, 1f), Random.Range(0, 1f), Random.Range(-1f, 1f));
-            GameObject target = Instantiate(Target) as GameObject;
-
-            if (randomSpawnPoint.magnitude < 0.001f)
-                randomSpawnPoint.x = 1f;
-
-            randomSpawnPoint.Normalize();
-            target.transform.position = randomSpawnPoint * SpawnRange + transform.position; // transform.position => 以Object所在位置生成
-            //TargetReusePool.GetSingleton..Add(target);
-        }*/
-        GameObject obj = new();
         var unusedObjectIndex = SearchUnusedObjectIndex();
 
         if (unusedObjectIndex != -1 && !_objectList[unusedObjectIndex].isUsing)
         {
-            
             _objectList[unusedObjectIndex].isUsing = true;
             _objectList[unusedObjectIndex].theObject.SetActive(true);
+            _allActived = false;
         }
         else
+        {
             Debug.Log("All objects are active.");
+            _allActived = true;
+            return;
+        }
 
-        Vector3 randomSpawnPoint = new(Random.Range(-1f, 1f), Random.Range(0, 1f), Random.Range(-1f, 1f));
-
-        if (randomSpawnPoint.magnitude < 0.001f)
-            randomSpawnPoint.x = 1f;
-
-        randomSpawnPoint.Normalize();
-        obj.transform.position = randomSpawnPoint * spawnRange + spawnPoint; // transform.position => 以Object所在位置生成
+        _objectList[unusedObjectIndex].theObject.transform.position = CalcRandomSpawnPoint(spawnRange, spawnPoint);
     }
 
-    public void DisableObject(GameObject gameObject)
+    public void DisableObject(string targetName)
     {
-        GameObject.Destroy(gameObject);
+        string token = targetName.Replace(_objectName, "");
+        int targetIndex = int.Parse(token);
+
+        //Debug.LogError("targetIndex: " + targetIndex);
+        _objectList[targetIndex].isUsing = false;
+        _objectList[targetIndex].theObject.SetActive(false);
+        _allActived = false;
     }
 
     private int SearchUnusedObjectIndex()
@@ -104,5 +101,17 @@ public class ObjectReusePool
             if (!_objectList[i].isUsing) return i;
 
         return -1;
+    }
+
+    private Vector3 CalcRandomSpawnPoint(float spawnRange, Vector3 spawnPoint)
+    {
+        Vector3 randomSpawnPoint = new(Random.Range(-1f, 1f), Random.Range(0, 1f), Random.Range(-1f, 1f));
+
+        if (randomSpawnPoint.magnitude < 0.001f)
+            randomSpawnPoint.x = 1f;
+
+        randomSpawnPoint.Normalize();
+
+        return randomSpawnPoint * spawnRange + spawnPoint;
     }
 }

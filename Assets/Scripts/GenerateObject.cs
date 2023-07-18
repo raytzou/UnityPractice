@@ -8,31 +8,37 @@ public class GenerateObject : MonoBehaviour
     Object Target; // Object任何素材皆可放(material、prefab...etc)
 
     [SerializeField]
-    [Range(1f, 10f)]
-    int TargetNum = 5;
+    [Range(1f, 100f)]
+    int TotalSpawnTimes = 5;
 
     [SerializeField]
-    [Range(1f, 10f)]
+    [Range(1f, 100f)]
     float SpawnRange = 1.0f;
 
-    //private List<GameObject> _targetList;
+    /// <summary>
+    /// How many seconds for spawning an target.
+    /// </summary>
+    [SerializeField]
+    [Range(10, 120)]
+    int SpawnTimer = 60;
+
+    private float _timeInterval = 0f;
 
     private void Start()
     {
-        TargetReusePool.GetSingleton.InitTargetPool();
-        //_targetList = new();
-       
-        for (int i = 0; i < TargetNum; i++)
+        ObjectReusePool.GetSingleton.InitObjectPool(Target, TotalSpawnTimes);
+    }
+
+    private void Update()
+    {
+        if (!ObjectReusePool.GetSingleton.AllActived)
         {
-            Vector3 randomSpawnPoint = new(Random.Range(-1f, 1f), Random.Range(0, 1f), Random.Range(-1f, 1f));
-            GameObject target = Instantiate(Target) as GameObject;
-
-            if (randomSpawnPoint.magnitude < 0.001f)
-                randomSpawnPoint.x = 1f;
-
-            randomSpawnPoint.Normalize();
-            target.transform.position = randomSpawnPoint * SpawnRange + transform.position; // transform.position => 以Object所在位置生成
-            //TargetReusePool.GetSingleton..Add(target);
+            _timeInterval += Time.deltaTime;
+            if(_timeInterval >= (SpawnTimer * 1.0))
+            {
+                ObjectReusePool.GetSingleton.SpawnObject(SpawnRange, transform.position);
+                _timeInterval = 0.0f;
+            }
         }
     }
 }
