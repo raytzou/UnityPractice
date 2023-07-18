@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5181417737600899488
 Transform:
   m_ObjectHideFlags: 0
@@ -110,4 +110,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea3deb925f34f944e87ff446cc872765, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyHP: 100
+  targetHP: 100

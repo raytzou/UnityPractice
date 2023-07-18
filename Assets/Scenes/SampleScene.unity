@@ -2964,8 +2964,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5181417737600899501, guid: d574b2439afbfc04e890e54725d089f7, type: 3}
-  TargetNum: 5
-  SpawnRange: 5
+  TotalSpawnTimes: 10
+  SpawnRange: 10
+  SpawnTimer: 10
 --- !u!4 &908878350
 Transform:
   m_ObjectHideFlags: 0
@@ -2974,7 +2975,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 908878348}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 55.03585, y: 6.07, z: 54.480347}
+  m_LocalPosition: {x: 55.03585, y: 1.68, z: 52.812}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
