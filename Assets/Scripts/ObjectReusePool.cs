@@ -64,15 +64,22 @@ public class ObjectReusePool
     /// </summary>
     /// <param name="spawnRange">float: how far the object can be</param>
     /// <param name="spawnPoint">Vector3: the position of spawn point</param>
-    public void SpawnObject(float spawnRange, Vector3 spawnPoint)
+    public void SpawnObject(float spawnRange, int spawnNum, Vector3 spawnPoint)
     {
-        var unusedObjectIndex = SearchUnusedObjectIndex();
+        //var unusedObjectIndex = SearchUnusedObjectIndex();
+        List<int> indexOfUnused = SearchUnusedObjectIndex();
 
-        if (unusedObjectIndex != -1 && !_objectList[unusedObjectIndex].isUsing)
+        if (indexOfUnused.Count > 0)
         {
-            _objectList[unusedObjectIndex].isUsing = true;
-            _objectList[unusedObjectIndex].theObject.SetActive(true);
             _allActived = false;
+            if (indexOfUnused.Count < spawnNum) spawnNum = indexOfUnused.Count;
+
+            for(int i = 0; i < spawnNum; i++)
+            {
+                _objectList[indexOfUnused[i]].theObject.SetActive(true);
+                _objectList[indexOfUnused[i]].theObject.transform.position = CalcRandomSpawnPoint(spawnRange, spawnPoint);
+                _objectList[indexOfUnused[i]].isUsing = true;
+            }
         }
         else
         {
@@ -80,8 +87,6 @@ public class ObjectReusePool
             _allActived = true;
             return;
         }
-
-        _objectList[unusedObjectIndex].theObject.transform.position = CalcRandomSpawnPoint(spawnRange, spawnPoint);
     }
 
     public void DisableObject(string targetName)
@@ -95,12 +100,14 @@ public class ObjectReusePool
         _allActived = false;
     }
 
-    private int SearchUnusedObjectIndex()
+    private List<int> SearchUnusedObjectIndex()
     {
-        for(int i = 0; i < _objectList.Count; i++)
-            if (!_objectList[i].isUsing) return i;
+        List<int> list = new();
 
-        return -1;
+        for(int i = 0; i < _objectList.Count; i++)
+            if (!_objectList[i].isUsing) list.Add(i);
+
+        return list;
     }
 
     private Vector3 CalcRandomSpawnPoint(float spawnRange, Vector3 spawnPoint)
