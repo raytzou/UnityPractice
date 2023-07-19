@@ -2964,9 +2964,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5181417737600899501, guid: d574b2439afbfc04e890e54725d089f7, type: 3}
-  TotalSpawnTimes: 10
+  SpawnMaximum: 10
   SpawnRange: 10
   SpawnTimer: 10
+  SpawnNum: 5
 --- !u!4 &908878350
 Transform:
   m_ObjectHideFlags: 0
