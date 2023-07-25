@@ -120,7 +120,7 @@ public class CharacterControllerTraining : MonoBehaviour
     private void MouseMove()
     {
         int offset = 50;
-        float cameraHeight = 0.7f;
+        float cameraHeight = 1.0f;
 
         mouseYaw += mouseSpeed * offset * Time.deltaTime * Input.GetAxis("Mouse X");
         mousePitch -= mouseSpeed * offset * Time.deltaTime * Input.GetAxis("Mouse Y");
