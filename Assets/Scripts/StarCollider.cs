@@ -4,26 +4,26 @@ using UnityEngine;
 
 public class StarCollider : MonoBehaviour
 {
-    [SerializeField] AudioSource SFX;
+    AudioSource SFX;
     [SerializeField] ParticleSystem[] VFXArray;
 
 
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name == "Player")
         {
-            transform.Find("SoftStar").gameObject.SetActive(false);
-            foreach (var vfx in VFXArray)
-            {
-                vfx.Play();
-            }
+            SFX = other.gameObject.GetComponent<AudioSource>();
             SFX.Play();
-            gameObject.GetComponent<SphereCollider>().isTrigger = false;
+
+            foreach (var vfx in VFXArray)
+                vfx.Play();
 
             var hp = other.gameObject.GetComponent<MyPlayerController>().PlayerHP;
            
             if (hp + .5f >= 1.0000f) other.gameObject.GetComponent<MyPlayerController>().PlayerHP = 1.0000f;
             else other.gameObject.GetComponent<MyPlayerController>().PlayerHP += .5f;
+
+            gameObject.SetActive(false);
         }
     }
 }
