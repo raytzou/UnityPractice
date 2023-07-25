@@ -8,6 +8,8 @@ TagManager:
   - Fire
   - Ground
   - Star
+  - WayPoint
+  - Wall
   layers:
   - Default
   - TransparentFX
