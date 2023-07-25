@@ -18,10 +18,20 @@ public class StarCollider : MonoBehaviour
             foreach (var vfx in VFXArray)
                 vfx.Play();
 
-            var hp = other.gameObject.GetComponent<MyPlayerController>().PlayerHP;
-           
-            if (hp + .5f >= 1.0000f) other.gameObject.GetComponent<MyPlayerController>().PlayerHP = 1.0000f;
-            else other.gameObject.GetComponent<MyPlayerController>().PlayerHP += .5f;
+            if(other.GetComponent<TPSControlTraining>() != null)
+            {
+                var hp = other.gameObject.GetComponent<TPSControlTraining>().PlayerHP;
+
+                if (hp + .5f >= 1.0000f) other.gameObject.GetComponent<TPSControlTraining>().PlayerHP = 1.0000f;
+                else other.gameObject.GetComponent<TPSControlTraining>().PlayerHP += .5f;
+            }
+            else if (other.GetComponent<MyPlayerController>() != null)
+            {
+                var hp = other.gameObject.GetComponent<MyPlayerController>().PlayerHP;
+
+                if (hp + .5f >= 1.0000f) other.gameObject.GetComponent<MyPlayerController>().PlayerHP = 1.0000f;
+                else other.gameObject.GetComponent<MyPlayerController>().PlayerHP += .5f;
+            }
 
             gameObject.SetActive(false);
         }
