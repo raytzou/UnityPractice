@@ -21,12 +21,14 @@ public class TPSControlTraining : MonoBehaviour
     public TPSCameraTarget CameraTarget;
     public CharacterController Controller;
     public LayerMask LayerMask; // for SphereCast
-    public float Velocity = 5f;
-
     public Transform CameraTransform;
     private Vector3 HorizontalDirection;
+
     private float VerticalDegree = 0f; // degree = degree + sensitive * (mouseY axis)
     public float DistanceToTarget = 5f; // for zoom-in, out
+    public float Velocity = 5f;
+
+    public float PlayerHP { get; set; } = 0.3f;
 
     private void Start()
     {
