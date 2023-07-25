@@ -15,6 +15,9 @@ public class TPSControlTraining : MonoBehaviour
     [Range(1f, 20f)]
     float MouseSensitive = 3f;
 
+    [SerializeField]
+    Animator animator;
+
     public TPSCameraTarget CameraTarget;
     public CharacterController Controller;
     public LayerMask LayerMask; // for SphereCast
@@ -28,8 +31,7 @@ public class TPSControlTraining : MonoBehaviour
     private void Start()
     {
         HorizontalDirection = transform.forward;
-
-        Main.Singleton.Init(); // singleton test
+        Cursor.visible = false;
         Main.Singleton.LoadResourcesTest(); // singleton test
     }
 
@@ -43,7 +45,7 @@ public class TPSControlTraining : MonoBehaviour
     private void MouseMove()
     {
         float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y"); // -1 to 1
+        float mouseY = Input.GetAxis("Mouse Y") * -1.0f; // -1 to 1
 
         #region 處理水平視角
         HorizontalDirection = Quaternion.Euler(0, mouseX * MouseSensitive, 0) * HorizontalDirection; // 水平旋轉
@@ -95,8 +97,14 @@ public class TPSControlTraining : MonoBehaviour
         Controller.Move(finalVector * Time.deltaTime); // 實際依向量結果移動
 
         #region 角色轉向結果
-        if (MoveVertical != 0 || MoveHorizontal != 0) // 按下W, A, S, D旋轉角色，角色朝向鏡頭前方
-            transform.forward = Vector3.Lerp(transform.forward, vectorToCameraForward, 0.1f);
+        if (MoveVertical != 0 || MoveHorizontal != 0) // 按下W, A, S, D旋轉角色，角色朝向行進方向
+            transform.forward = Vector3.Lerp(transform.forward, finalVector, 0.1f);
+        #endregion
+
+        #region Animator Training
+        var moveAmount = Mathf.Clamp(Mathf.Abs(MoveVertical) + Mathf.Abs(MoveHorizontal), 0, 7);
+
+        animator.SetFloat("Speed", moveAmount, 0.2f, Time.deltaTime);
         #endregion
     }
 }
