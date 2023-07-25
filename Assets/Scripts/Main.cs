@@ -28,10 +28,6 @@ public class Main
         Instance = this;
     }*/
 
-    public void Init()
-    {
-        Debug.LogError("My singleton");
-    }
 
     /// <summary>
     /// Example for loading resource
