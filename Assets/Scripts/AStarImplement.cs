@@ -41,11 +41,11 @@
  */
 
 //#define DEBUG_NODE_INFO
-//#define DEBUG_SNODE_ENODE
-//#define DEBUG_CURNODE
+#define DEBUG_SNODE_ENODE
+#define DEBUG_PATHING_INFO
 //#define DEBUG_PRINT_ALL_NEXTNODE
-//#define DEBUG_NEXTNODE
-//#define DEBUG_LOOP_PRINT
+//#define DEBUG_THE_ADD_NEXTNODE
+//#define DEBUG_LOOP_LISTS_INFO
 
 
 using System.Collections;
@@ -54,39 +54,39 @@ using UnityEngine;
 
 public class AStarImplement : MonoBehaviour
 {
-
     public LayerMask Ground;
     public LayerMask Wall;
 
     enum NodeStatus
     {
-        None = -1, // lost in black hole
+        None = -1, // have not checked yet, or the node just drop in black hole :<
         Open,
         Close
     }
 
     class PathNode
     {
-        public GameObject node;
-        public List<PathNode> neighborList; // transfer from waypoint
+        public GameObject waypoint; // the waypoint in game
+        public List<PathNode> neighborList; // transfering GameObject to PathNode is mayhem
         public int floor = 0; // not implement yet,
         public bool link = false; // not implement yet
         public float gScore = 0f; // g(current.node) = g(current.node.parent) + cost(current.node.parent, current.node)
                                   // The cost from Start to Current node
         public float hScore = 0f; // h(current.node) = | current.node.x - goal.node.x | + | current.node.y - goal.node.y |
-                                  // The cost from Current node to End node
+                                  // The cost from Current node to End node (estimate)
         public float fScore = 0f; // fScore = gScore + hScore
                                   // Combination of gScore and hScore
-        
+        public Vector3 position = Vector3.zero; // position of the node
 
-        //public Vector3 Position { get; set; } // I use GameObject node.transform.position, the Instance doesn't really need
-        public PathNode ParentNode { get; set; }
+        public PathNode ParentNode { get; set; } // A cute instance here but not field,
+                                                 // cuz I'm not sure the ParentNode of the CurrentNode will be changed
+                                                 // if NextNode has the same neighbor as CurrentNode?
 
         public NodeStatus nodeStatus; // calculate later after run algorithm
     }
 
     private List<PathNode> _nodeList;
-    private List<PathNode> _openList = new(); // for implement A*, set private
+    private List<PathNode> _openList = new(); // for implementing A* only, set private
     private List<PathNode> _closeList = new();
     private List<Vector3> _pathList = new(); // store every paths that node has been checked, clear everytime in BuildPath()
     //private List<List<Vector3>> _myTestPathList = new(); // two-dimension list for pathList, {start, end}
@@ -98,21 +98,30 @@ public class AStarImplement : MonoBehaviour
 
         foreach (GameObject waypoint in waypointsArray) // every waypoints on scene
         {
-            List<PathNode> neighbors = new();
-            foreach (var neighbor in waypoint.GetComponent<WayPoint>().neighborList) // every neighbors in single waypoint
+            //List<PathNode> neighbors = new();
+            PathNode node = new()
+            {
+                waypoint = waypoint,
+                neighborList = new(),
+                nodeStatus = NodeStatus.None,
+                position = waypoint.transform.position
+            };
+
+            // cannot handle neighbors here, because every PathNode have not been initialized yet
+            /*foreach (var neighbor in waypoint.GetComponent<WayPoint>().neighborList) // every neighbors in single waypoint
             {
                 //Debug.LogError(waypoint.name + " " + neighbor.name);
-                neighbors.Add(new PathNode { node = neighbor,  });
-            }
+                neighbors.Add(node)
+            }*/
 
-            _nodeList.Add(new PathNode
-            {
-                node = waypoint,
-                neighborList = neighbors,
-            });
+            _nodeList.Add(node);
         }
 
+        InitNeighborListInsideNode(); // Now I do initialize neighbor list in every PathNode here.
 
+#if DEBUG_NODE_INFO
+        LogNodeAndNeighbors();
+#endif
     }
 
 #if DEBUG_NODE_INFO
@@ -131,170 +140,150 @@ public class AStarImplement : MonoBehaviour
     }
 #endif
 
+    /// <summary>
+    /// May God mercy the pathetic 3D nested loop.
+    /// </summary>
+    private void InitNeighborListInsideNode()
+    {
+        foreach(var theNode in _nodeList)
+        {
+            foreach(var neighbor in theNode.waypoint.GetComponent<WayPoint>().neighborList)
+            {
+                foreach(var n in _nodeList)
+                {
+                    if (theNode == n || theNode.neighborList.Contains(n)) continue;
+                    if(n.waypoint == neighbor)
+                    {
+                        theNode.neighborList.Add(n);
+                        break;
+                    }
+                }
+            }
+        }
+
+        Debug.Log("NeighborList in PathNode initialized");
+    }
+
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0)) // seems it detects two or more times?
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            var bMouseHit = Physics.Raycast(ray, out RaycastHit hitInfo, 9999, Ground);
-            
-            if (bMouseHit)
+            bool mouseHit = Physics.Raycast(ray, out RaycastHit hitInfo, 9999, Ground);
+            //Debug.LogError(hitInfo == null);
+            if (mouseHit)
             {
                 Debug.Log("mouse hit: " + hitInfo.point);
                 bool aStar = AStar(transform.position, hitInfo.point);
-
-                Debug.LogError("aStar: " + aStar);
+                Debug.Log("aStar success? " + aStar);
             }
         }
     }
 
     private bool AStar(Vector3 npcPos, Vector3 mouseHitPos)
     {
+        Debug.Log("AStar start");
         PathNode startNode = GetNearestNode(npcPos);
         PathNode endNode = GetNearestNode(mouseHitPos);
 
 #if DEBUG_SNODE_ENODE
-        Debug.Log("start node: " + startNode.node.name + ", end node: " + endNode.node.name);
-        Debug.Log("start node pos: " + startNode.node.transform.position);
-        Debug.Log("end node pos: " + endNode.node.transform.position);
+        Debug.Log("start node: " + startNode.waypoint.name + ", end node: " + endNode.waypoint.name);
+        Debug.Log("start node pos: " + startNode.position);
+        Debug.Log("end node pos: " + endNode.position);
 #endif
-
-        // _pathList = new(); // why don't clear in the beginning?
 
         if (startNode is null || endNode is null)
         {
             Debug.LogError("AStar ERROR: cannot find the \"Start\" or \"End\" node, they probably drop in the black hole :<");
             return false;
         }
-        else if(startNode.node == endNode.node)
+        else if(startNode.waypoint == endNode.waypoint)
         {
             Debug.Log("Start node is the same as end node.");
-            var pos = startNode.node.transform.position;
+            var pos = startNode.position;
 
             BuildPath(npcPos, mouseHitPos, startNode, endNode); // first possible path, start = end
             return true;
         }
 
         /*
-            Open : priority queue for next node
-            Closed : list of next node has had been checked
+            Open : priority queue for next node, the node will be calculated its new gScore
+            Closed : list of next node had been checked, and gScore was bad :<
+            None: the node has not been checked yet, claculating its scores first time.
          */
         _openList = new();
         _closeList = new();
         ResetAllNodesInfo(); // clear in every round for new stats
-
-        PathNode currentNode = startNode;
-
-        _openList.Add(currentNode);
+        _openList.Add(startNode);
 
         while(_openList.Count > 0)
         {
-            currentNode = GetBestNode();
-
-#if DEBUG_CURNODE
-            Debug.Log("currentNode: " + currentNode.node.name);
-            Debug.Log("currentNode pos: " + currentNode.node.transform.position);
-#endif
+            PathNode currentNode = PopBestNode();
+            _closeList.Add(currentNode);
 
             if (currentNode == null)
             {
                 Debug.LogError("Cannot find the best node, are every scores in node set?");
                 return false;
             }
-            else if(currentNode.node == endNode.node)
+            else if(currentNode.waypoint == endNode.waypoint)
             {
-                Debug.Log("Current node is the same as end node.");
+#if DEBUG_PATHING_INFO
+                Debug.Log("Current node is the same as end node, or the pathing is end.");
+#endif
 
                 BuildPath(npcPos, mouseHitPos, startNode, endNode); // second possible path
                 return true;
             }
 
-
-            /*
-              remove x from openset                                         //將x節點從將被估算的節點中刪除
-              add x to closedset                                            //將x節點插入已經被估算的節點
-             */
-            _closeList.Add(currentNode);
-            _openList.Remove(currentNode);
-            currentNode.nodeStatus = NodeStatus.Close;
-
             for (int i = 0; i < currentNode.neighborList.Count; i++) // Breadth-First Search algorithm, checking every nodes near by current node.
             {
-                /*
-                 for each y in neighbor_nodes(x)                               //循環遍歷與x相鄰節點
-                     if y in closedset                                         //若y已被估值，跳過
-                         continue
-                     tentative_g_score := g_score[x] + dist_between(x,y)       //從起點到節點y的距離
-
-                     if y not in openset                                       //若y不是將被估算的節點
-                         tentative_is_better := true                           //暫時判斷為更好
-                     elseif tentative_g_score < g_score[y]                     //如果起點到y的距離小於y的實際距離
-                         tentative_is_better := true                           //暫時判斷為更好
-                     else
-                         tentative_is_better := false                          //否則判斷為更差
-                 */
-
                 PathNode nextNode = currentNode.neighborList[i];
+                Vector3 currentToNext;
+
+#if DEBUG_PATHING_INFO
+                Debug.Log("currentNode: " + currentNode.waypoint.name + " nextNode: " + nextNode.waypoint.name + " status: " + nextNode.nodeStatus);
+#endif
 
                 if (nextNode.nodeStatus == NodeStatus.Close) // back route
                 {
-                    Debug.Log("cur node: " + currentNode.node.name + $", next node ({nextNode.node.name}) was closed.");
+#if DEBUG_PATHING_INFO
+                    Debug.Log($"nextNode ( {nextNode.waypoint.name} ) was closed. Skip.");
+#endif
                     continue;
                 }
-
-                Vector3 currentToNext = nextNode.node.transform.position - currentNode.node.transform.position;
-                var distance = currentToNext.magnitude;
-                var tentativeGScore = currentNode.gScore + distance;
-
-                Debug.LogError(nextNode.gScore + " " + tentativeGScore);
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                /// gScore of nextNode always zero
-                if (nextNode.nodeStatus == NodeStatus.Open 
-                    && tentativeGScore > nextNode.gScore
-                    ) // bad next node, cost more than prediction
+                else if (nextNode.nodeStatus == NodeStatus.Open) // bad next node, cost more than prediction
                 {
-                    /*#region CalculatingCurrentGScore
-                    float currentGScore = 0f;
+                    #region Calculating NewGScore
+                    currentToNext = currentNode.position - nextNode.position;
+                    float newGScore = currentNode.gScore + currentToNext.magnitude;
 
-                    currentToNext = currentNode.node.transform.position - nextNode.node.transform.position;
-                    currentGScore = currentNode.gScore + currentToNext.magnitude;
-
-                    if (currentGScore < nextNode.gScore)
+                    if (newGScore < nextNode.gScore) 
                     {
-                        nextNode.gScore = currentGScore;
+                        nextNode.gScore = newGScore;
                         nextNode.fScore = nextNode.gScore + nextNode.hScore;
                         nextNode.ParentNode = currentNode;
                     }
-                    #endregion*/
-                    Debug.LogError("BAD NEXT NODE");
-                    Debug.LogError("nextnode: " + nextNode.node.name + ", gScore: " + nextNode.gScore);
-                    continue; 
-                }
-
-#if DEBUG_PRINT_ALL_NEXTNODE
-                Debug.Log("cur node: " + currentNode.node.name + ", next node: " +  nextNode.node.name);
+                    #endregion
+#if DEBUG_PATHING_INFO
+                    Debug.Log("bad next node :(");
+                    Debug.Log("nextnode: " + nextNode.waypoint.name);
 #endif
 
-                /*
-                 if tentative_is_better = true                             //如果判斷為更好
-                    came_from[y] := x                                     //將y設為x的子節點
-                    g_score[y] := tentative_g_score                       //更新y到原點的距離
-                    h_score[y] := heuristic_estimate_of_distance(y, goal) //估計y到終點的距離
-                    f_score[y] := g_score[y] + h_score[y]
-                    add y to openset                                      //將y插入將被估算的節點中
-                 */
-                #region CalculatingScoresOfNextNode
-                nextNode.gScore = tentativeGScore;
-                currentToNext = endNode.node.transform.position - nextNode.node.transform.position;
-                nextNode.hScore = currentToNext.magnitude;
+                    continue;
+                }
+                
+#if DEBUG_PRINT_ALL_NEXTNODE
+                Debug.Log("cur node: " + currentNode.node.name + ", next node: " + nextNode.node.name);
+#endif
+
+                #region Calculating Unchecked NextNode (status = none)
+                currentToNext = currentNode.position - nextNode.position;
+                nextNode.gScore = currentNode.gScore + currentToNext.magnitude;
+                //currentToNext = endNode.node.transform.position - nextNode.node.transform.position;
+                var hScorePredict = endNode.position - nextNode.position;
+                nextNode.hScore = hScorePredict.magnitude;
                 nextNode.fScore = nextNode.gScore + nextNode.hScore;
                 #endregion
 
@@ -302,13 +291,16 @@ public class AStarImplement : MonoBehaviour
                 _openList.Add(nextNode);
                 nextNode.nodeStatus = NodeStatus.Open;
 
-#if DEBUG_NEXTNODE
+#if DEBUG_THE_ADD_NEXTNODE
                 Debug.Log("Next Node: " + nextNode.node.name);
-                Debug.Log("NextNode pos: " + nextNode.node.transform.position);
+                Debug.Log("NextNode pos: " + nextNode.position);
 #endif
             }
 
-#if DEBUG_LOOP_PRINT
+            currentNode.nodeStatus = NodeStatus.Close;
+            _closeList.Add(currentNode);
+
+#if DEBUG_LOOP_LISTS_INFO
             Debug.Log($"open({_openList.Count}): ");
             foreach (var node in _openList) Debug.Log(node.node.name);
             Debug.Log($"close({_closeList.Count}): ");
@@ -316,7 +308,8 @@ public class AStarImplement : MonoBehaviour
 #endif
         }
 
-        if(_pathList.Count > 0) return true; else return false;
+        Debug.Log("Path (node) count: " + _pathList.Count);
+        return false;
     }
 
     /// <summary>
@@ -332,10 +325,6 @@ public class AStarImplement : MonoBehaviour
             theNode.hScore = 0.0f;
             theNode.nodeStatus = NodeStatus.None;
         }
-
-#if DEBUG_NODE_INFO
-        LogNodeAndNeighbors();
-#endif
     }
 
     /// <summary>
@@ -349,13 +338,12 @@ public class AStarImplement : MonoBehaviour
 
         float minDistance = int.MaxValue;
 
-        foreach (var theNode in _nodeList)
+        foreach (var theNode in _nodeList) // Linear search, should do something for optimizing. What if the map is huge or nodes are many?
         {
-            //Debug.Log(theNode.node.name);
-            var nodePos = theNode.node.transform.position;
+            var nodePos = theNode.waypoint.transform.position;
             if (Physics.Linecast(thePos, nodePos, Wall)) continue; // from the position to node, if hit wall, then skip
 
-            Vector3 vecNodeToPos = theNode.node.transform.position - thePos;
+            Vector3 vecNodeToPos = theNode.waypoint.transform.position - thePos;
             var distance = vecNodeToPos.magnitude;
 
             if(distance < minDistance)
@@ -372,7 +360,7 @@ public class AStarImplement : MonoBehaviour
     /// Find the lowest fScore node in Open List
     /// </summary>
     /// <returns>The lowest fScore node.</returns>
-    private PathNode GetBestNode()
+    private PathNode PopBestNode()
     {
         PathNode bestNode = null;
         float minFScore = float.MaxValue;
@@ -400,7 +388,7 @@ public class AStarImplement : MonoBehaviour
                                                                         // this will be much easier, but it can't add middle parent nodes (from start to end), and it always do single one line moving
         _pathList = new() { startPos }; // add startPostion first
 
-        if (startNode.node == endNode.node)
+        if (startNode.waypoint == endNode.waypoint)
             _pathList.Add(startPos);
         else
         {
@@ -408,7 +396,7 @@ public class AStarImplement : MonoBehaviour
 
             while(parentNode != null) // fetch all parent nodes from current endNode
             {
-                _pathList.Insert(1, parentNode.node.transform.position);
+                _pathList.Insert(1, parentNode.waypoint.transform.position);
                 parentNode = parentNode.ParentNode; // set as next parent node
             }
         }
