@@ -50,6 +50,8 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class AStarImplement : MonoBehaviour
@@ -89,14 +91,20 @@ public class AStarImplement : MonoBehaviour
     private List<PathNode> _openList = new(); // for implementing A* only, set private
     private List<PathNode> _closeList = new();
     private List<Vector3> _pathList = new(); // store every paths that node has been checked, clear everytime in BuildPath()
-    //private List<List<Vector3>> _myTestPathList = new(); // two-dimension list for pathList, {start, end}
+    private GameObject[] _waypointsArray;
+    private Color _originWPColor;
+    private Color _originNPCColor;
+
+    private bool _aStar = false;
 
     private void Start()
     {
         _nodeList = new();
-        GameObject[] waypointsArray = GameObject.FindGameObjectsWithTag("WayPoint");
+        _waypointsArray = GameObject.FindGameObjectsWithTag("WayPoint");
+        _originWPColor = _waypointsArray[0].GetComponent<Renderer>().material.color;
+        _originNPCColor = gameObject.GetComponent<Renderer>().material.color;
 
-        foreach (GameObject waypoint in waypointsArray) // every waypoints on scene
+        foreach (GameObject waypoint in _waypointsArray) // every waypoints on scene
         {
             //List<PathNode> neighbors = new();
             PathNode node = new()
@@ -152,7 +160,7 @@ public class AStarImplement : MonoBehaviour
                 foreach(var n in _nodeList)
                 {
                     if (theNode == n || theNode.neighborList.Contains(n)) continue;
-                    if(n.waypoint == neighbor)
+                    if (n.waypoint == neighbor)
                     {
                         theNode.neighborList.Add(n);
                         break;
@@ -171,12 +179,25 @@ public class AStarImplement : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             bool mouseHit = Physics.Raycast(ray, out RaycastHit hitInfo, 9999, Ground);
-            //Debug.LogError(hitInfo == null);
+
+            #region reset colors and aStar boolean
+            foreach (var wp in _waypointsArray)
+                wp.GetComponent<Renderer>().material.color = _originWPColor;
+            _aStar = false;
+            gameObject.GetComponent<Renderer>().material.color = _originNPCColor;
+            #endregion
+
             if (mouseHit)
             {
                 Debug.Log("mouse hit: " + hitInfo.point);
-                bool aStar = AStar(transform.position, hitInfo.point);
-                Debug.Log("aStar success? " + aStar);
+                _aStar = AStar(transform.position, hitInfo.point);
+                Debug.Log("aStar success? " + _aStar);
+                //Debug.DrawLine(hitInfo.point, Vector3.up * 1000, Color.red, 1000);
+                var tmpPos = hitInfo.point;
+                tmpPos.y += 1;
+                var effect = GameObject.Find("ShockWave");
+                effect.transform.position = tmpPos;
+                effect.transform.Find("Particle System").GetComponent<ParticleSystem>().Play();
             }
         }
     }
@@ -384,8 +405,6 @@ public class AStarImplement : MonoBehaviour
     /// </summary>
     private void BuildPath(Vector3 startPos, Vector3 endPos, PathNode startNode, PathNode endNode)
     {
-        // _myTestPathList.Add(new List<Vector3> { startPos, endPos }); // the line will be argued by Kevin lol
-                                                                        // this will be much easier, but it can't add middle parent nodes (from start to end), and it always do single one line moving
         _pathList = new() { startPos }; // add startPostion first
 
         if (startNode.waypoint == endNode.waypoint)
@@ -406,6 +425,30 @@ public class AStarImplement : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        
+        Gizmos.color = Color.green;
+
+        if (_aStar)
+        {
+            for (int i = 0; i < _pathList.Count - 1; i++)
+            {
+                var sPos = _pathList[i];
+                sPos.y += 1; // can't see the line if don't set height lol
+                var ePos = _pathList[i + 1];
+                ePos.y += 1; 
+
+                Gizmos.DrawLine(sPos, ePos);
+                
+                foreach (var wp in _waypointsArray)
+                {
+                    if(wp.transform.position == _pathList[i])
+                    {
+                        wp.GetComponent<Renderer>().material.color = Color.yellow;
+                        break;
+                    }
+                }
+            }
+
+            gameObject.GetComponent<Renderer>().material.color = Color.yellow;
+        }
     }
 }
