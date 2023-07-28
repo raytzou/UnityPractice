@@ -2509,9 +2509,9 @@ GameObject:
   - component: {fileID: 1991156937}
   - component: {fileID: 1991156936}
   - component: {fileID: 1991156935}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2651,7 +2651,7 @@ MonoBehaviour:
   Controller: {fileID: 2011620400}
   LayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
   CameraTransform: {fileID: 1355904591}
   DistanceToTarget: 5
   Velocity: 5
