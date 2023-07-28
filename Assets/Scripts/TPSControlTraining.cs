@@ -90,17 +90,17 @@ public class TPSControlTraining : MonoBehaviour
         float MoveHorizontal = Input.GetAxis("Horizontal");
 
         //transform.Rotate(0f, MoveHorizontal, 0f); // 角色旋轉，單純Rotate Horizontal Axis即可
-        
-        var vectorToCameraForward = MoveVertical * Velocity * CameraTransform.forward; // W、S 前後方向依CameraTransform
-        var vectorToCameraRight = MoveHorizontal * Velocity * CameraTransform.right; // A、D左右平移同理
-        vectorToCameraForward.y = 0f; // Y 軸拿掉，改使用Move()，不拿掉Y軸，Camera看天空、地上，角色會跟著翻轉
-        Vector3 finalVector = vectorToCameraForward + vectorToCameraRight; // 最後結果，兩向量相加
 
-        Controller.Move(finalVector * Time.deltaTime); // 實際依向量結果移動
+        var vectorToCameraForward = MoveVertical * CameraTransform.forward; // W、S 前後方向依CameraTransform
+        var vectorToCameraRight = MoveHorizontal * CameraTransform.right; // A、D左右平移同理
+        Vector3 finalVector = vectorToCameraForward + vectorToCameraRight; // 最後結果，兩向量相加
+        finalVector.y = 0f; // 平移不看Y軸
+
+        Controller.Move(Time.deltaTime * Velocity * finalVector.normalized); // 最後向量結果單位化(防止鏡頭向下導致行進方向因鏡頭向下)，乘以速度
 
         #region 角色轉向結果
         if (MoveVertical != 0 || MoveHorizontal != 0) // 按下W, A, S, D旋轉角色，角色朝向行進方向
-            transform.forward = Vector3.Lerp(transform.forward, finalVector, 0.1f);
+            transform.forward = Vector3.Lerp(transform.forward, finalVector, 0.5f); // 內插補針，0.1 => 0.5
         #endregion
 
         #region Animator Training
