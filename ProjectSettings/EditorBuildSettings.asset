@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/AdvancedHomework/Main Menu.unity
     guid: effb4107734f5994fb0fc80806fafeb6
   - enabled: 1
-    path: Assets/Scenes/AdvancedHomework/Showcase.unity
+    path: Assets/Scenes/AdvancedHomework/Lobby.unity
     guid: a204fb4700642124aa9f9238e58e7c0f
+  - enabled: 1
+    path: Assets/Scenes/AdvancedHomework/PathFinding.unity
+    guid: 4e04f2fb7c1cce74e835bccad3a5b441
+  - enabled: 1
+    path: Assets/Scenes/PlayGround.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}

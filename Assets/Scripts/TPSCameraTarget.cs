@@ -9,20 +9,20 @@ public class TPSCameraTarget : MonoBehaviour
     [SerializeField] float CameraHeight;
     Vector3 currentVel = Vector3.zero;
 
-    public bool SwitchCameraFollow = true;
+    public bool LerpCameraFollow = true;
 
     public void UpdateCameraTargetTransform()
     {
         //transform.position = Target.position + Vector3.up * CameraHeight;
         var vectorToTarget = Target.position + Vector3.up * CameraHeight;
         #region 鏡頭尾隨方法1
-        if (SwitchCameraFollow)
+        if (LerpCameraFollow)
             transform.position = Vector3.Lerp(transform.position, vectorToTarget, 0.1f);
         #endregion
 
         #region 鏡頭尾隨方法2
         else
-            transform.position = Vector3.SmoothDamp(transform.position, vectorToTarget, ref currentVel, 0.1f);
+            transform.position = Vector3.SmoothDamp(transform.position, vectorToTarget, ref currentVel, Time.deltaTime);
         #endregion
     }
 }

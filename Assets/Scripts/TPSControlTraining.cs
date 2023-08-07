@@ -20,7 +20,7 @@ public class TPSControlTraining : MonoBehaviour
 
     public TPSCameraTarget CameraTarget;
     public CharacterController Controller;
-    public LayerMask LayerMask; // for SphereCast
+    public LayerMask Obstacle; // for SphereCast
     public Transform CameraTransform;
     private Vector3 HorizontalDirection;
 
@@ -30,11 +30,12 @@ public class TPSControlTraining : MonoBehaviour
 
     public float PlayerHP { get; set; } = 0.3f;
 
+    public bool BuddhaMode => _buddhaMode = false;
+    private bool _buddhaMode = false;
+
     private void Start()
     {
         HorizontalDirection = transform.forward;
-        Cursor.visible = false;
-        Main.Singleton.LoadResourcesTest(); // singleton test
     }
 
     private void Update()
@@ -42,10 +43,31 @@ public class TPSControlTraining : MonoBehaviour
         CameraTarget.UpdateCameraTargetTransform(); // 防止多筆物件同時Update造成物件(Target或Camera)快速抖動，因此先Update Target再Update Camera
         MouseMove();
         CharacterMove();
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            var playerPos = transform.position;
+
+            playerPos.y += 0.3f;
+
+            Ray ray = new(playerPos, transform.forward);
+            int button = 1 << LayerMask.NameToLayer("Button");
+
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, 3f, button))
+                Main.GetSingleton.EnablePortal(hitInfo.collider.gameObject);
+        }
+
+        if(PlayerHP <= 0)
+        {
+            if (_buddhaMode) PlayerHP = 0.1f;
+            else PlayerHP = 0;
+        }
     }
 
     private void MouseMove()
     {
+        if (Main.GetSingleton.IsGamePause) return;
+
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y") * -1.0f; // -1 to 1
 
@@ -70,7 +92,7 @@ public class TPSControlTraining : MonoBehaviour
 
         #region 處理鏡頭超出牆壁或地上
         /// SphereCast(Target出發點，半徑，攝影鏡頭方向，raycast hit，鏡頭和Target的距離再加上微調，LayerMask)
-        if (Physics.SphereCast(CameraTarget.transform.position, 0.2f, -finalVector, out RaycastHit rayHit, DistanceToTarget + 0.2f, LayerMask))
+        if (Physics.SphereCast(CameraTarget.transform.position, 0.2f, -finalVector, out RaycastHit rayHit, DistanceToTarget + 0.2f, Obstacle))
         {
             newCameraPosition = CameraTarget.transform.position - finalVector * (rayHit.distance - 0.1f); // 計算Camera到Target距離
         }
@@ -88,8 +110,6 @@ public class TPSControlTraining : MonoBehaviour
     {
         float MoveVertical = Input.GetAxis("Vertical");
         float MoveHorizontal = Input.GetAxis("Horizontal");
-
-        //transform.Rotate(0f, MoveHorizontal, 0f); // 角色旋轉，單純Rotate Horizontal Axis即可
 
         var vectorToCameraForward = MoveVertical * CameraTransform.forward; // W、S 前後方向依CameraTransform
         var vectorToCameraRight = MoveHorizontal * CameraTransform.right; // A、D左右平移同理

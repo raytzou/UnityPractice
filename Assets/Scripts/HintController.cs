@@ -2,23 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class HintController : MonoBehaviour
 {
     [SerializeField]
     TMP_Text tmp;
-    void Awake()
+
+    private int _currentScene = 0;
+
+    void Start()
     {
-        tmp = GetComponent<TMP_Text>();
-        StartCoroutine(FadeOutCoroutine());
+        _currentScene = SceneManager.GetActiveScene().buildIndex;
+
+        if (_currentScene == 3)
+        {
+            tmp = GetComponent<TMP_Text>();
+            tmp.text = "Objects will be generated at center of map";
+            StartCoroutine(FadeOutCoroutine());
+        }
+    }
+
+    
+
+    private void Update()
+    {
+        if (_currentScene < 2 && Main.GetSingleton.IsPortalEnable)
+        {
+            tmp.text = "Left Portal: Path Finding scene";
+            tmp.text += "\nRight Portal: FPS + Object Pool showcase";
+        }
     }
 
     private IEnumerator FadeOutCoroutine()
     {
-        float duration = 2f; // 3 seconds
+        float duration = 3f; // 3 seconds
         float currentTime = 0f;
 
-        while(currentTime < duration)
+        while (currentTime < duration)
         {
             /// public static float Lerp(float a, float b, float t);
             /// Linearly interpolates between a and b by t.
