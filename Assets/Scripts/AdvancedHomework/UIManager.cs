@@ -39,7 +39,7 @@ public class UIManager : MonoBehaviour
             UpdateHealthBar();
 
         if (_enables[2]) // fps
-            DisplayFPS();
+            DisplayFPS(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void OnSceneLoaded(Scene currentScene, LoadSceneMode sceneMode)
@@ -60,10 +60,9 @@ public class UIManager : MonoBehaviour
             case 2: // Path Finding (A* and object seek)
                 if (Score.enabled) Score.enabled = false;
                 if (HealthBar.active) HealthBar.SetActive(false);
-                if (FPS.enabled) FPS.enabled = false;
                 _enables[0] = false;
                 _enables[1] = false;
-                _enables[2] = false;
+                Destroy(Hint);
                 break;
             case 3: // Object Pool (just List does object recycle)
                 Hint.text = "Objects will be generated at center of map";
@@ -80,9 +79,15 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void DisplayFPS()
+    private void DisplayFPS(int sceneIndex)
     {
-        var playerObject = GameObject.Find("Player");
+        GameObject playerObject;
+
+        if(sceneIndex == 2) // path finding scene
+            playerObject = GameObject.Find("Character");
+        else
+            playerObject = GameObject.Find("Player");
+
         int currentFps = (int)(1f / Time.unscaledDeltaTime);
         float positionX = Mathf.Round(playerObject.transform.position.x);
         float positionY = Mathf.Round(playerObject.transform.position.y);
