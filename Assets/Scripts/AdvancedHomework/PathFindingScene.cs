@@ -9,4 +9,10 @@ public class PathFindingScene : MonoBehaviour
     {
         Main.GetSingleton.CursorController(SceneManager.GetActiveScene().buildIndex);
     }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+            Main.GetSingleton.ShowPauseMenu();
+    }
 }
