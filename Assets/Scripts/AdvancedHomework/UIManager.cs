@@ -24,6 +24,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         DontDestroyOnLoad(this);
+        DontDestroyOnLoad(GameObject.Find("EventSystem"));
         _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.alpha = 0f;
     }
