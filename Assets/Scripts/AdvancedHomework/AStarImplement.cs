@@ -175,6 +175,7 @@ public class AStarImplement : MonoBehaviour
 
     private void Update()
     {
+        if (Main.GetSingleton.IsGamePause) return;
         if(steeringbehavior.TargetPosition != Vector3.zero) steeringbehavior.Seek(gameObject);
 
         if (Input.GetMouseButtonDown(0)) // seems it detects two or more times?
