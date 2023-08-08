@@ -19,11 +19,10 @@ public class EnemyNavMesh : MonoBehaviour
 
             if(_timeInterval >= 1f)
             {
-                var vec = (Target.transform.position - Agent.transform.position);
+                var impactForce = (Target.transform.position - transform.position).normalized;
 
-                //Target.transform.position += -vec*5f; // this can't work on Character Controller
-                //vec.y = 0f;
-                Target.GetComponent<CharacterController>().Move(100f * Time.deltaTime * -vec);
+                impactForce.y += .5f;
+                Target.GetComponent<CharacterController>().Move(Vector3.Lerp(impactForce, Target.transform.position, Time.deltaTime));
                 Target.GetComponent<TPSControlTraining>().PlayerHP -= 0.1f;
                 _timeInterval = 0f;
             }
